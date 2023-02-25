@@ -1,0 +1,16 @@
+{
+  "name": "mineroleplay",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "mongoose": "^6.5.1",
+    "nodemailer": "^6.7.7",
+    "request": "^2.88.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "world28",
+  "description": ""
+}

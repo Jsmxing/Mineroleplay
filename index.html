@@ -1,0 +1,408 @@
+<!DOCTYPE html> <!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8" />
+
+    <meta content="yes" name="apple-mobile-web-app-capable" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;"
+    />
+    <title>Mineroleplay</title>
+    <link
+      rel="shortcut icon"
+      href="main.ico"
+    />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link rel="stylesheet" href="css/swiper.min.css" />
+    <link rel="stylesheet" href="css/scrollbar.css" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/vue-toastificatin.css" />
+    <script src="js/vue.global.prod.js"></script>
+    <script src="js/vue-toastificatin.js"></script>
+
+    <style>
+      body {
+        margin: 0;
+      }
+
+      #app {
+        width: 100%;
+      }
+
+      .block {
+        width: 100%;
+        min-height: 100vh;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .empty {
+        font-size: 18px;
+        line-height: 400px;
+        text-align: center;
+      }
+
+      .intro .card {
+        margin-top: 100px;
+        width: 680px;
+      }
+
+      .intro-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+
+      .intro-header svg {
+        fill: #4c5053;
+        vertical-align: middle;
+      }
+
+      .intro-header span {
+        font-weight: bold;
+        font-size: 18px;
+      }
+
+      .intro-body {
+        padding-right: 16px;
+        height: 320px;
+        overflow-y: scroll;
+      }
+
+      .intro-body-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-auto-rows: min-content;
+        grid-gap: 16px;
+      }
+
+      .intro-item > * {
+        width: 100%;
+        user-select: none !important;
+      }
+
+      .intro-item img {
+        border-radius: 4px;
+      }
+
+      .intro-item p {
+        text-align: center;
+        margin: 0 0;
+        margin-top: 6px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .intro-item {
+        min-width: 0;
+        height: auto;
+        background-color: #f5f7fa;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: filter 0.15s ease;
+      }
+
+      .intro-item:hover {
+        filter: brightness(.9);
+      }
+
+      .intro-body-sentence {
+        text-indent: 2em;
+      }
+
+      .intro-body-sentence p:first-child {
+        font-size: 18px;
+        line-height: 1.5;
+        margin-bottom: 12px;
+      }
+
+      .background .card {
+        max-width: 95%;
+      }
+
+      @media screen and (max-width: 526px) {
+        .intro-body {
+          height: 500px;
+        }
+
+        .intro-body-grid {
+          padding-right: 0;
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div :class="`navbar ${isTop?'navbar__top':''}`">
+        <div class="nav-item logo" @click="scrollTo(0)">Mine<span class="sub">roleplay</span></div>
+        <div class="nav-item yun-input search-bar">
+          <input type="text" placeholder="搜索" @input="handleSearch" />
+        </div>
+        <ul class="nav-item link">
+          <li @click="scrollTo('intro')">介绍</li>
+          <li @click="scrollTo('background')">背景</li>
+          <li @click="scrollTo('submit')">投稿</li>
+        </ul>
+      </div>
+
+      <div class="block intro" id="intro">
+        <div v-if="factions.length !== 0" class="card">
+          <div v-show="activeRole == null">
+            <div class="intro-header">
+              <span>{{ faction.name }}</span>
+              <div class="yun-anchor" @click="switchFaction">
+                <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="18" height="18"><path d="M872.1 197.6L684.4 72.5c-5.3-3.5-12.4 0.3-12.4 6.7V160H384C207.3 160 64 303.3 64 480v64c0 45.9 9.7 89.6 27.1 129 2 4.6 7.6 6.2 11.8 3.5l95.4-63.6c3-2 4.3-5.7 3.2-9.2-6.2-19-9.4-39.1-9.4-59.7v-64c0-51.3 20-99.5 56.2-135.8C284.5 308 332.7 288 384 288h288v81.3c0 6.4 7.1 10.2 12.4 6.7L872 250.9c19.1-12.7 19.1-40.6 0.1-53.3zM151.2 833.3l187.6 125.1c5.3 3.5 12.4-0.3 12.4-6.7v-80.8h288c176.7 0 320-143.3 320-320v-64c0-45.9-9.7-89.6-27.1-129-2-4.6-7.6-6.2-11.8-3.5L825 418c-3 2-4.3 5.7-3.2 9.2 6.2 19 9.4 39.1 9.4 59.7v64c0 51.3-20 99.5-56.2 135.8-36.3 36.3-84.5 56.2-135.8 56.2h-288v-81.3c0-6.4-7.1-10.2-12.4-6.7L151.2 780c-18.9 12.7-18.9 40.6 0 53.3z"></path></svg>
+              </div>
+            </div>
+            <div v-if="filtedRoles.length!==0" class="intro-body intro-body-grid" @wheel.stop>
+              <div v-for="item in filtedRoles" class="intro-item" @click="activeRole = item">
+                <img :src="item.avatar" alt="avatar">
+                <p>{{ item.name }}</p>
+              </div>
+            </div>
+            <div v-else class="empty">
+              暂无数据
+            </div>
+          </div>
+
+          <div v-if="activeRole != null">
+            <div class="intro-header">
+              <span>{{ activeRole.name }}：</span>
+              <div class="yun-anchor" @click="activeRole = null">
+                <svg viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" width="18" height="18"><path d="M512 451.67l225.835-225.835a42.667 42.667 0 0 1 60.33 60.33L572.331 512l225.834 225.835a42.667 42.667 0 0 1-60.33 60.33L512 572.331 286.165 798.165a42.667 42.667 0 1 1-60.33-60.33L451.669 512 225.835 286.165a42.667 42.667 0 0 1 60.33-60.33L512 451.669z"></path></svg>
+              </div>
+            </div>
+            <div class="intro-body intro-body-sentence" @wheel.stop>
+              <p>{{ activeRole.Sentence }}</p>
+            </div>
+          </div>
+
+        </div>
+        <div v-else class="card empty">
+          加载中
+        </div>
+      </div>
+
+      <div class="block background" id="background">
+        <div class="background_card">
+            <p>阿普莱斯人类政府<br>
+            你们是“阿普莱斯人类政府”的一员。你们是二层的实际掌控者。自“复苏时代”开始，你们不断探究有关“污秽”与“水灾”的一切，试图找到解决它们的方法，拯救所有人类。<br>
+            ★你们的目标：解决灾难<br>
+            ▷你们与菲尔劳斯军事集团有着表面上的合作。部分研究成果共享。</p>
+            
+            <p>菲尔劳斯军事集团<br>
+            你们是“菲尔劳斯军事集团”的一员。你们的实验比政府更加激进，造成了不少人员伤亡。好在他们的牺牲为你们赢得了更加快速的发展。你们拥有强大的军事力量。你们认为尽快向更高层转移才是明智之举。<br>
+            ★你们的目标：转移至三层及以上地区<br>
+            ▷你们与阿普莱斯人类政府有着表面上的合作。部分研究成果共享。</p>
+
+            <p>附:阿普莱斯人类政府旗下部门<br>
+            1.  科学研究会<br>
+            2.  行政部门<br>
+            3.  考古部门<br>
+            阿普莱斯人类政府更倾向于“净化”第一层，从根源上解决灾难。<br>
+            菲尔劳斯军事集团更倾向于“抛弃”第一层，往更高的层数转移。<br>
+            两者表面合作共生，实则各怀心思。<br>
+            人类政府在明面掌控管理权，实则军事力量不敌该集团。</p>
+
+            <p>请选择其中一个阵营背景 书写自己的人设</p>
+          </div>
+      </div>
+
+      <div class="block submit" id="submit">
+        <div class="card form">
+          <div class="person-info">
+            <div class="form-item">
+              <label for="input_name">昵称</label>
+              <div class="yun-input">
+                <input type="text" id="input_name" v-model="form.name" />
+              </div>
+            </div>
+            <div class="form-item">
+              <label for="input_qq">QQ</label>
+              <div class="yun-input">
+                <input type="number" id="input_qq" v-model="form.qq" />
+              </div>
+            </div>
+          </div>
+          <div class="form-item form-item-intro">
+            <label for="input_intro">介绍</label>
+            <div class="yun-input">
+              <textarea type="text" rows="5" id="input_intro" v-model="form.js"></textarea>
+            </div>
+          </div>
+          <div class="form-item-controls">
+            <div class="yun-select" style="min-width: 120px;">
+              <select v-model="form.faction">
+                <option v-for="item in factions" :value="item.id" :key="item.id">{{ item.name }}</option>
+              </select>
+            </div>
+            <div :class="`yun-button submit ${isSumiting?'disabled':''}`" @click="handleSubmit">投稿</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const { createApp, ref, onMounted, onUnmounted, nextTick, watch, computed } = Vue;
+      const { useToast } = VueToastificationPlugin;
+
+      function useScrollTop() {
+        const scrollTop = ref(0);
+        const listener = () => {
+          scrollTop.value = window.scrollY;
+        }
+        onMounted(() => window.addEventListener("scroll", listener));
+        onUnmounted(() => window.removeEventListener("scroll", listener));
+        return scrollTop;
+      }
+
+      createApp({
+        setup() {
+          const toast = useToast();
+
+          const activeRole = ref(null);
+          const roles = ref([]);
+          const faction = ref({});
+          const factions = ref([]);
+          const form = ref({});
+
+          const scrollTop = useScrollTop();
+          const isTop = ref(false);
+          const isSumiting = ref(false);
+
+          let currentSection = 0;
+          const sections = ["intro", "background", "submit"];
+          document.getElementById('app').addEventListener('wheel', e =>{
+            if (e.deltaY > 0) {
+              currentSection = Math.min(sections.length - 1, currentSection + 1);
+            } else {
+              currentSection = Math.max(0, currentSection - 1);
+            }
+            e.preventDefault();
+            scrollTo(sections[currentSection]);
+          });
+          
+          watch(scrollTop, (value) => {
+            currentSection = Math.ceil((value - (window.innerHeight / 2)) / window.innerHeight);
+            console.debug(currentSection)
+            if (value > 40) {
+              isTop.value = true;
+            } else {
+              isTop.value = false;
+            }
+          });
+
+          window.onerror = window.onunhandledrejection = (e)=> {
+            console.error('onerror:', e);
+            toast.error(e.message ?? e.reason.message);
+          };
+
+          async function apiRequest(uri, method='GET', data=null) {
+            const res = await fetch('/api' + uri, {
+              method: method,
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: data ? JSON.stringify(data): undefined,
+            });
+            
+            if(res.status !== 200) {
+			    if(res.status === 360){
+				    throw new Error('抱歉，当前已停止提交审核！');
+                }else if(res.status === 300){
+                    throw new Error('当前名称已存在，请勿重复提交，请耐心等待审核，如需修改内容请联系管理员删除先前人设并重新审核');
+                }else if(res.status === 350){
+                    throw new Error('当前QQ已存在，请勿重复提交，请耐心等待审核，如需修改内容请联系管理员删除先前人设并重新审核');
+                }else if(res.status === 400){
+                    throw new Error('请检查信息是否填写完整！');
+                }else{
+                    throw new Error('服务器异常');
+                }
+            }
+            return await res.json()
+          }
+
+          const seachContent = ref('');
+          function handleSearch(e) {
+            seachContent.value = e.target.value;
+          }
+
+          const filtedRoles = computed(()=> {
+            return roles.value.filter(item => {
+              return (item.faction === faction.value.id) && (!seachContent.value || item.name.indexOf(seachContent.value)!=-1 || item.qq.toString().startsWith(seachContent.value));
+            });
+          })
+
+          onMounted(async ()=>{
+            const data = await apiRequest('/get');
+            roles.value = data.roles;
+            factions.value = data.factions;
+            faction.value = data.factions[0];
+            form.value.faction = data.factions[0].id;
+          })
+
+          function scrollTo(target) {
+            let top = target;
+            if(typeof target !== "number") {
+              const targetElement = document.getElementById(target);
+              if(targetElement) top = targetElement.offsetTop;
+            }
+            window.scrollTo({
+              top,
+              behavior: 'smooth'
+            })
+          }
+
+          async function handleSubmit() {
+            try {
+              isSumiting.value = true;
+              if(!form.value.name || !form.value.qq || !form.value.js) {
+                throw new Error('请填写完整信息');
+              }
+              await apiRequest('/update', 'POST', form.value);
+              form.value = {};
+              toast.success('投稿成功，请耐心等待审核');
+            } catch (error) {
+              console.warn('sumit: ', error);
+              toast.warning(error.message ?? '网络错误');
+            } finally {
+              isSumiting.value = false;
+            }
+          }
+
+          function switchFaction() {
+            const cur = factions.value.findIndex(item => item.id === faction.value.id);
+            faction.value = factions.value[cur + 1] || factions.value[0];
+          }
+
+          return {
+            activeRole,
+            faction,
+            factions,
+            filtedRoles,
+            isTop,
+            form,
+            isSumiting,
+            scrollTo,
+            handleSubmit,
+            handleSearch,
+            switchFaction
+          }
+        }
+      }).use(VueToastificationPlugin, {
+        position: 'bottom-right',
+        duration: 2000
+      }).mount('#app');
+    </script>
+  </body>
+</html>
